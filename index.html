@@ -1,307 +1,1161 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" dir="ltr">
 <head>
-    <meta charset="UTF-8">
-    <title>HansAssistent Pro – Universal Master Configuration v3.1 PWA</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#05060a">
-    <meta name="description" content="Dein persönliches Master-Dashboard – offline-fähig, installierbar, editierbar">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="HansAssistent Pro">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#080408">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="FUNKENFLUG JW Edition v10.0 - Operante Konditionierung nach B.F. Skinner mit TSTBT Integration">
+<title>FUNKENFLUG | JW Edition v10.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#080408;--deep:#110b14;--surface:#1a1020;--surface2:#241630;
+  --crimson:#c0283e;--burgundy:#6b0f1f;--gold:#c9a84c;--silk:#ede6db;
+  --muted:rgba(237,230,219,.6);--em:#2dbe78;--ruby:#e03c3c;--amber:#f0a500;
+  --tech-magenta:#ff00ff;--tech-cyan:#00d4ff;
+  --glow-gold:0 0 20px rgba(201,168,76,.4);--glow-crimson:0 0 20px rgba(192,40,62,.3);
+  --font-header:'Cinzel',serif;--font-quote:'Cormorant Garamond',serif;
+  --font-body:'DM Sans',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+html,body{height:100%;background:var(--void);color:var(--silk);font-family:var(--font-body);overflow:hidden}
+input,textarea{-webkit-user-select:text;user-select:text}
+.watermark{position:fixed;bottom:10px;right:10px;opacity:.15;font-size:9px;color:var(--gold);pointer-events:none;z-index:1000;font-family:var(--font-header);text-align:right}
+.tamil-sig{position:fixed;top:10px;left:10px;opacity:.15;color:var(--gold);font-size:10px;z-index:1000;pointer-events:none;font-family:var(--font-mono)}
+.mutex-indicator{position:fixed;top:70px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--em);box-shadow:0 0 10px var(--em);z-index:1001;transition:all .3s}
+.mutex-indicator.locked{background:var(--ruby);box-shadow:0 0 10px var(--ruby);animation:pulseMutex 1s infinite}
+@keyframes pulseMutex{0%,100%{opacity:1}50%{opacity:.5}}
 
-    <!-- PWA Manifest (inline als data-URI) -->
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiSGFuc0Fzc2lzdGVudCBQcm8gLSB2My4xIiwic2hvcnRfbmFtZSI6IkhhbnNBc3Npc3RlbnQiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9oYW5zLXN3YXRoaS5naXRodWIuaW8vaWNvbi0xOTJ4MTkyLnBuZyIsInR5cGUiOiJpbWFnZS9wbmciLCJzaXplcyI6IjE5MngxOTIifV0sInN0YXJ0X3VybCI6Ii4vIiwidGhlbWVfY29sb3IiOiIjMDUwNjBhIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJvcmllbnRhdGlvbiI6InBvcnRyYWl0In0=">
+.screen{position:absolute;inset:0;display:none;flex-direction:column;padding:24px 16px;background:var(--void);overflow-y:auto;opacity:0;transition:opacity .4s}
+.screen.active{display:flex;opacity:1;z-index:50}
+#screen-auth{z-index:100;background:rgba(0,0,0,.98);justify-content:center;align-items:center;padding:20px}
+.auth-content{background:linear-gradient(145deg,var(--deep),rgba(45,10,10,.9));border:3px solid var(--gold);border-radius:24px;padding:45px 30px;max-width:460px;width:92%;text-align:center;box-shadow:var(--glow-gold)}
+.auth-title{font-family:var(--font-header);font-size:2.2rem;color:var(--gold);margin-bottom:8px;letter-spacing:3px}
+.auth-sub{font-family:var(--font-quote);font-style:italic;color:var(--crimson);margin-bottom:30px;font-size:1.1rem}
+.code-input{width:100%;max-width:260px;height:56px;background:var(--surface);border:2px solid rgba(201,168,76,.3);color:var(--gold);font-family:var(--font-mono);font-size:1.3rem;text-align:center;letter-spacing:10px;border-radius:12px;outline:none;transition:all .3s;margin:20px 0}
+.code-input:focus{border-color:var(--gold);box-shadow:0 0 25px rgba(201,168,76,.2)}
+.code-input.unlocked{border-color:var(--em);color:var(--em);animation:pulse 2s infinite}
+.hint-text{font-size:.75rem;color:var(--muted);margin-top:10px;font-style:italic}
 
-    <style>
-        /* ===== ALLE ORIGINAL-STYLES + PWA-ERWEITERUNGEN ===== */
-        :root {
-            --bg: #05060a;
-            --bg-alt: #0c0f18;
-            --card: #101623;
-            --accent: #f5b642;
-            --accent-soft: rgba(245, 182, 66, 0.15);
-            --accent-strong: rgba(245, 182, 66, 0.85);
-            --text: #f5f7ff;
-            --text-muted: #a4acc4;
-            --danger: #ff5c7a;
-            --ok: #3ad29f;
-            --info: #5b8aff;
-            --border-soft: rgba(255, 255, 255, 0.08);
-            --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.55);
-            --radius-lg: 18px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-        }
+#hud{position:fixed;top:0;left:0;right:0;height:60px;background:linear-gradient(180deg,rgba(8,4,8,.98),rgba(26,10,10,.95));border-bottom:2px solid var(--gold);display:none;align-items:center;justify-content:space-between;padding:0 15px;z-index:100}
+#hud.active{display:flex}
+.hud-logo{font-family:var(--font-header);font-size:1.3em;background:linear-gradient(135deg,var(--gold),var(--silk));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px}
+.hud-center{text-align:center;flex:1}
+.hud-label{font-size:10px;color:var(--gold-dark);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.hud-bar{width:120px;height:6px;background:rgba(255,255,255,.1);border-radius:3px;margin:0 auto;overflow:hidden}
+.hud-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--crimson));width:0%;transition:width .8s;box-shadow:var(--glow-gold)}
+.hud-lives{display:flex;align-items:center;gap:8px;background:rgba(107,15,26,.4);padding:6px 12px;border-radius:20px;border:1px solid var(--burgundy);font-family:var(--font-header);font-size:.9em}
+.hud-lives.danger{border-color:var(--ruby);animation:pulse 1s infinite}
 
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: radial-gradient(circle at top, #141927 0, #05060a 55%, #020308 100%);
-            color: var(--text);
-            line-height: 1.5;
-            padding-bottom: 70px; /* Platz für Bottom-Nav */
-        }
+.discipline-hub{max-width:600px;margin:0 auto;width:100%;padding-top:60px}
+.hub-title{font-family:var(--font-header);font-size:1.8rem;color:var(--gold);text-align:center;margin-bottom:10px}
+.hub-sub{text-align:center;font-family:var(--font-quote);font-style:italic;color:var(--muted);margin-bottom:40px;font-size:1rem}
+.discipline-chain{display:flex;flex-direction:column;gap:20px;position:relative;padding-left:15px}
+.chain-line{position:absolute;left:25px;top:40px;bottom:40px;width:2px;background:linear-gradient(to bottom,var(--gold) var(--progress,0%),rgba(255,255,255,.08) var(--progress,0%));transition:all .6s}
+.discipline-node{position:relative;z-index:1;background:var(--surface);border:2px solid rgba(212,175,55,.15);border-radius:18px;padding:20px 18px 20px 65px;transition:all .35s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.discipline-node.locked{opacity:.35;cursor:not-allowed;filter:grayscale(.8);pointer-events:none}
+.discipline-node.unlocked{border-color:var(--gold);box-shadow:0 4px 20px rgba(212,175,55,.08)}
+.discipline-node.unlocked:hover{transform:translateX(8px);border-color:var(--silk);box-shadow:0 8px 30px rgba(212,175,55,.15)}
+.discipline-node.active{border-color:var(--crimson);background:linear-gradient(135deg,rgba(192,40,62,.1),var(--surface));box-shadow:0 0 30px rgba(192,40,62,.2)}
+.discipline-node.mastered{border-color:var(--em);background:linear-gradient(135deg,rgba(45,190,120,.08),var(--surface))}
+.node-number{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;background:var(--deep);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--font-header);font-weight:700;font-size:1.2rem;color:var(--gold);box-shadow:0 0 15px rgba(0,0,0,.5)}
+.discipline-node.locked .node-number{border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.3)}
+.discipline-node.mastered .node-number{background:var(--em);border-color:var(--em);color:#fff}
+.node-title{font-family:var(--font-header);font-size:1.15rem;color:var(--gold);margin-bottom:5px}
+.node-desc{font-size:.85rem;color:var(--muted);line-height:1.4;margin-bottom:8px}
+.node-reward{display:inline-block;padding:3px 10px;background:rgba(212,175,55,.1);border:1px solid var(--gold);border-radius:20px;font-size:.65rem;color:var(--gold);text-transform:uppercase;letter-spacing:1px;font-family:var(--font-mono)}
 
-        /* ===== PWA-INSTALL-BUTTON & STATUS ===== */
-        #installBtn {
-            position: fixed;
-            bottom: 85px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent);
-            color: #05060a;
-            font-weight: 700;
-            padding: 10px 20px;
-            border-radius: 999px;
-            box-shadow: 0 8px 25px rgba(245,182,66,0.4);
-            display: none;
-            z-index: 999;
-            font-size: 0.85rem;
-        }
+/* Disziplin I: Arcade */
+#screen-d1{padding-top:70px;gap:12px;justify-content:flex-start}
+.d1-header{font-family:var(--font-header);font-size:13px;font-weight:700;color:var(--crimson);letter-spacing:.3em;text-transform:uppercase;text-align:center}
+.d1-timer-wrap{width:100%;max-width:400px;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.d1-timer-bar{height:100%;background:var(--gold);width:100%;border-radius:3px;transition:width .1s linear,background .5s}
+.d1-arena{width:100%;max-width:400px;flex:1;position:relative;background:var(--surface);border-radius:12px;border:1px solid rgba(201,168,76,.15);overflow:hidden;touch-action:none}
+.d1-count{font-family:var(--font-mono);font-size:12px;color:var(--gold);text-align:center;letter-spacing:.1em}
+.spark{position:absolute;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:none;transition:left .05s,top .05s;z-index:10}
+.spark-inner{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle,var(--gold) 0%,var(--crimson) 55%,transparent 100%);box-shadow:var(--glow-gold);animation:spark-pulse 1.2s infinite}
+@keyframes spark-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.d1-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;border:2px solid rgba(201,168,76,.4);display:flex;align-items:center;justify-content:center;font-family:var(--font-header);font-size:10px;color:var(--gold);opacity:.5;letter-spacing:.05em;pointer-events:none}
 
-        /* ===== BOTTOM NAV (MOBILE) ===== */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(5,6,10,0.95);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-soft);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0 4px;
-            z-index: 100;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.6);
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text-muted);
-            font-size: 0.68rem;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        .nav-item.active {
-            color: var(--accent);
-        }
-        .nav-item span {
-            font-size: 1.35rem;
-            margin-bottom: 2px;
-        }
+/* Disziplin II: Quiz */
+#screen-d2{padding-top:70px;gap:16px;justify-content:flex-start}
+.d2-header{font-family:var(--font-header);font-size:13px;font-weight:700;color:var(--crimson);letter-spacing:.3em;text-transform:uppercase;text-align:center}
+.d2-timer-wrap{width:100%;max-width:400px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.d2-timer-bar{height:100%;background:var(--gold);width:100%;border-radius:2px;transition:width 1s linear}
+.d2-q-num{font-family:var(--font-mono);font-size:11px;color:var(--gold);opacity:.6;text-align:center;letter-spacing:.1em;margin-bottom:10px}
+.d2-question{font-family:var(--font-quote);font-size:1.25rem;line-height:1.5;color:var(--silk);text-align:center;max-width:380px;padding:20px;background:var(--surface);border-radius:10px;border:1px solid rgba(201,168,76,.15);min-height:100px;display:flex;align-items:center;justify-content:center}
+.d2-options{width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px}
+.d2-option{width:100%;font-family:var(--font-body);font-size:.95rem;color:var(--silk);background:var(--surface);border:1px solid rgba(237,230,219,.2);border-radius:8px;padding:16px;text-align:left;cursor:pointer;transition:all .2s;min-height:48px}
+.d2-option:active{background:var(--surface2)}
+.d2-option.correct{border-color:var(--em);background:rgba(45,190,120,.15);color:var(--em)}
+.d2-option.wrong{border-color:var(--ruby);background:rgba(224,60,60,.15);color:var(--ruby);animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
-        /* ===== ORIGINAL STYLES (gekürzt – alle aus deiner Datei bleiben erhalten) ===== */
-        .page { max-width: 1120px; margin: 0 auto; padding: 18px 14px 28px; }
-        .header { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(18px); background: linear-gradient(to bottom, rgba(5,6,10,0.94), rgba(5,6,10,0.8), transparent); border-bottom: 1px solid var(--border-soft); padding: 10px 0 8px; }
-        .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(15,23,42,0.85); border: 1px solid var(--accent-soft); color: var(--accent); font-size: 0.72rem; text-transform: uppercase; }
-        .grid { display: grid; gap: 14px; }
-        @media (min-width: 880px) { .grid-2 { grid-template-columns: 1.2fr 1fr; } .grid-3 { grid-template-columns: 1fr 1fr 1fr; } }
-        .card { background: radial-gradient(circle at top left, #161e30 0, #05060a 55%, #020308 100%); border-radius: var(--radius-lg); padding: 16px 16px 14px; border: 1px solid var(--border-soft); box-shadow: var(--shadow-soft); position: relative; overflow: hidden; }
-        .card::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at top right, rgba(245,182,66,0.18), transparent 60%); opacity: 0.85; mix-blend-mode: screen; pointer-events: none; }
-        .card-inner { position: relative; z-index: 1; }
+/* Disziplin III: Casino */
+#screen-d3{padding-top:70px;justify-content:flex-start}
+.casino-menu{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:400px;margin:30px auto;width:100%}
+.casino-card{background:var(--surface);border:2px solid rgba(201,168,76,.2);border-radius:20px;padding:25px 15px;text-align:center;cursor:pointer;transition:all .3s}
+.casino-card:hover{border-color:var(--gold);transform:translateY(-5px);box-shadow:0 10px 30px rgba(212,175,55,.1)}
+.casino-icon{font-size:2.8rem;margin-bottom:12px}
+.casino-name{font-family:var(--font-header);font-size:1rem;color:var(--gold);margin-bottom:4px}
+.casino-desc{font-size:.75rem;color:var(--muted)}
+.bj-table{width:100%;max-width:420px;margin:20px auto;background:linear-gradient(135deg,#0d3318,#1a4d2e);border:3px solid var(--gold);border-radius:16px;padding:20px}
+.bj-hand{margin:12px 0}
+.bj-label{color:var(--gold);font-size:.7rem;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.bj-cards{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;min-height:80px}
+.playing-card{width:50px;height:75px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-header);font-weight:700;font-size:1rem;color:#1a1a1a;box-shadow:0 4px 8px rgba(0,0,0,.3)}
+.playing-card.red{color:#c62828}
+.dice-box{display:flex;justify-content:center;gap:25px;margin:40px 0}
+.die{width:80px;height:80px;background:linear-gradient(145deg,#fff,#e0e0e0);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#1a1a1a;font-family:var(--font-header);font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.4);transition:transform .6s}
+.die.rolling{animation:dice-roll .6s ease-in-out}
+@keyframes dice-roll{0%{transform:rotateX(0) rotateY(0)}100%{transform:rotateX(360deg) rotateY(360deg)}}
+.dice-result{text-align:center;font-size:1.1rem;color:var(--gold);min-height:50px;margin-top:20px;font-family:var(--font-quote);font-style:italic}
+.bj-controls{display:flex;justify-content:center;gap:15px;margin-top:20px}
 
-        /* Bar-Charts & Radar (unverändert) */
-        .bar-chart, .radar-wrapper { background: rgba(15,23,42,0.9); border-radius: var(--radius-md); padding: 10px; border: 1px solid var(--border-soft); }
-        .bar-fill { transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        
-        /* Edit-Modus Highlight */
-        .editable { cursor: pointer; position: relative; }
-        .editable:hover::after { content: "✏️"; position: absolute; right: 8px; top: 8px; font-size: 0.9rem; opacity: 0.6; }
+/* Disziplin IV: JW Edition */
+#screen-d4{padding-top:70px;justify-content:flex-start}
+.jw-tabs{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:5px;max-width:600px;margin:0 auto 25px}
+.jw-tab{flex:1;min-width:100px;padding:12px 8px;background:var(--surface);border:1.5px solid rgba(201,168,76,.2);border-radius:12px;text-align:center;cursor:pointer;transition:all .25s;font-family:var(--font-header);font-size:.75rem;white-space:nowrap}
+.jw-tab.active{background:rgba(212,175,55,.1);border-color:var(--gold);color:var(--gold);box-shadow:var(--glow-gold)}
+.intensity-row{display:flex;justify-content:center;gap:30px;margin-bottom:30px}
+.intensity-btn{width:50px;height:50px;border-radius:50%;border:2px solid var(--burgundy);background:transparent;color:var(--gold);font-family:var(--font-header);font-size:1.3rem;cursor:pointer;transition:all .3s}
+.intensity-btn.active{border-color:var(--crimson);background:var(--crimson);box-shadow:0 0 20px var(--crimson);transform:scale(1.1)}
+.swipe-arena{flex:1;background:linear-gradient(145deg,rgba(107,15,26,.3),rgba(0,0,0,.5));border:2px solid var(--gold);border-radius:20px;padding:24px;position:relative;overflow:hidden;touch-action:pan-y;min-height:300px;max-width:500px;margin:0 auto;width:100%}
+.swipe-card{background:linear-gradient(135deg,rgba(107,15,26,.4),rgba(0,0,0,.6));border:2px solid var(--gold);border-radius:16px;padding:30px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:85%;max-width:320px;text-align:center;cursor:grab;transition:transform .3s,opacity .3s;box-shadow:0 10px 40px rgba(0,0,0,.5);z-index:10}
+.swipe-card.dragging{cursor:grabbing;transition:none}
+.swipe-card.reject{transform:translate(-150%,-50%) rotate(-30deg)!important;opacity:0}
+.swipe-card.accept{transform:translate(150%,-50%) rotate(30deg)!important;opacity:0}
+.swipe-hint{position:absolute;bottom:30px;left:0;right:0;display:flex;justify-content:space-between;padding:0 40px;pointer-events:none;font-size:40px;font-weight:900;opacity:0;transition:opacity .3s}
+.hint-left{color:var(--ruby)}.hint-right{color:var(--em)}
+.card-cat{font-family:var(--font-header);color:var(--gold);font-size:.9em;text-transform:uppercase;letter-spacing:3px;margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid var(--burgundy)}
+.card-title{font-family:var(--font-header);color:var(--gold);font-size:1.3em;margin-bottom:15px;text-transform:uppercase}
+.card-text{font-family:var(--font-quote);font-size:1.2em;line-height:1.5;font-style:italic;color:var(--silk)}
+.wheel-overlay{position:fixed;inset:0;background:rgba(8,4,8,.95);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:20px}
+.wheel-overlay.active{display:flex}
+.wheel-container{position:relative;width:min(300px,85vw);height:min(300px,85vw);max-width:320px}
+.wheel{width:100%;height:100%;border-radius:50%;position:relative;overflow:hidden;border:6px solid var(--gold);transition:transform 4s cubic-bezier(.17,.67,.12,.99);box-shadow:var(--glow-gold)}
+.wheel-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:65px;height:65px;background:var(--void);border:3px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-header);font-size:.75rem;color:var(--gold);z-index:5;box-shadow:0 0 30px rgba(0,0,0,.8)}
+.wheel-pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-top:30px solid var(--gold);z-index:10;filter:drop-shadow(var(--glow-gold))}
 
-        /* Psychometrie-Demo */
-        .demo-card { background: rgba(245,182,66,0.08); border: 1px solid var(--accent-soft); }
-    </style>
+/* Editor */
+.editor-tabs{display:flex;gap:10px;margin-bottom:25px;border-bottom:1px solid rgba(201,168,76,.2);padding-bottom:10px;max-width:600px;margin:0 auto 25px}
+.editor-tab{padding:10px 20px;background:transparent;border:none;color:var(--muted);font-family:var(--font-header);font-size:.8rem;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.editor-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.editor-section{display:none;max-width:600px;margin:0 auto;width:100%}
+.editor-section.active{display:block;animation:fadeUp .3s}
+.item-list{display:flex;flex-direction:column;gap:10px;margin-bottom:25px;max-height:30vh;overflow-y:auto}
+.item-card{background:var(--surface);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:15px;position:relative;font-size:.85rem}
+.item-card .del{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--ruby);cursor:pointer;font-size:1.2rem;width:30px;height:30px}
+.add-form{background:var(--surface);border:2px solid rgba(201,168,76,.2);border-radius:16px;padding:20px}
+.form-row{margin-bottom:15px}
+.form-label{display:block;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--deep);border:1px solid rgba(201,168,76,.3);color:var(--silk);padding:12px;border-radius:8px;font-family:var(--font-body);font-size:.9rem;outline:none}
+.form-textarea{resize:vertical;min-height:80px}
+
+/* TSTBT Panel */
+.tstbt-panel{background:rgba(10,10,10,.9);border:1px solid var(--tech-magenta);border-radius:16px;padding:20px;margin-top:24px;display:none}
+.tstbt-panel.active{display:block}
+.tstbt-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid var(--surface2);padding-bottom:12px}
+.tstbt-title{color:var(--tech-magenta);font-size:16px;font-weight:700;letter-spacing:1px;font-family:var(--font-header)}
+.test-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.test-btn{background:var(--surface);border:1px solid var(--tech-magenta);color:var(--tech-magenta);padding:12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .3s;text-transform:uppercase;font-family:var(--font-body)}
+.test-btn:active{transform:scale(.95);background:var(--tech-magenta);color:var(--void)}
+.test-btn.danger{border-color:var(--ruby);color:var(--ruby)}
+.log-console{background:rgba(0,0,0,.5);border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:11px;height:120px;overflow-y:auto;color:var(--tech-cyan);line-height:1.6;border:1px solid rgba(0,212,255,.2);margin-top:12px}
+.log-entry{margin-bottom:4px;opacity:.8}
+.log-entry.error{color:var(--ruby)}.log-entry.success{color:var(--em)}.log-entry.warn{color:#f59e0b}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.stat-box{background:var(--surface);padding:10px;border-radius:8px;text-align:center}
+.stat-value{font-size:20px;font-weight:900;color:var(--tech-magenta);display:block;font-family:var(--font-header)}
+.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+
+/* Players */
+.players-section{margin-top:20px;background:rgba(0,0,0,.3);border-radius:12px;padding:15px}
+.section-title{font-size:14px;color:var(--gold);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;font-family:var(--font-header)}
+.players-container{display:flex;flex-direction:column;gap:8px}
+.player-card{background:var(--surface);border-left:3px solid var(--gold);border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;transition:all .3s}
+.player-card.bot{border-left-color:var(--tech-magenta)}
+.player-main{display:flex;align-items:center;gap:10px}
+.player-dot{width:8px;height:8px;border-radius:50%;background:var(--em);box-shadow:0 0 10px currentColor}
+.player-name{font-weight:600;font-size:14px;color:var(--silk)}
+.bot-badge{background:var(--tech-magenta);color:var(--void);font-size:9px;padding:2px 6px;border-radius:4px;font-weight:900;letter-spacing:.5px}
+.player-metrics{display:flex;gap:12px;font-size:12px;color:var(--muted)}
+
+/* Overlay & Modals */
+.msg-overlay{position:fixed;inset:0;background:rgba(8,4,8,.92);z-index:80;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:16px}
+.msg-overlay.active{display:flex}
+.msg-title{font-family:var(--font-header);font-size:20px;font-weight:700;color:var(--gold);text-align:center;letter-spacing:.2em;text-transform:uppercase}
+.msg-body{font-family:var(--font-quote);font-style:italic;font-size:15px;color:var(--silk);text-align:center;line-height:1.75;max-width:320px}
+.freeze-overlay{position:fixed;inset:0;background:rgba(192,40,62,.15);z-index:90;display:none;pointer-events:none}
+.freeze-overlay.active{display:block;animation:freeze-flash .5s ease}
+@keyframes freeze-flash{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:14px 28px;background:linear-gradient(135deg,var(--burgundy),var(--crimson));border:1.5px solid var(--gold);color:var(--silk);font-family:var(--font-header);font-size:.9rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:12px;cursor:pointer;transition:transform .15s,box-shadow .2s;box-shadow:0 4px 20px rgba(192,40,62,.25)}
+.btn:active{transform:scale(.96)}
+.btn:disabled{opacity:.35;pointer-events:none;border-color:#555}
+.btn-ghost{background:transparent;border:1.5px solid var(--muted);color:var(--muted);box-shadow:none}
+.btn-green{background:linear-gradient(135deg,#164a2e,var(--em));border-color:var(--em)}
+.btn-gold{background:linear-gradient(135deg,#b8860b,var(--gold));border-color:var(--gold);color:var(--void)}
+.btn-tech{background:transparent;border:1px solid var(--tech-magenta);color:var(--tech-magenta);font-size:.7em;padding:8px 12px}
+.btn-sm{padding:10px 20px;font-size:.75rem}
+.tutorial-step{position:absolute;inset:0;background:rgba(8,4,8,.9);z-index:70;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:14px}
+.tutorial-step.active{display:flex}
+.tut-box{background:rgba(192,40,62,.12);border:1px solid var(--crimson);border-radius:10px;padding:18px 16px;max-width:340px;font-family:var(--font-quote);font-style:italic;font-size:15px;color:var(--silk);line-height:1.75;text-align:center}
+.tut-icon{font-size:36px;margin-bottom:4px}
+.hidden{display:none!important}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--void)}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+</style>
 </head>
 <body>
+<div class="tamil-sig">ரா<br>சுவாதி</div>
+<div class="watermark">JW EDITION<br>v10.0<br>26101908</div>
+<div class="mutex-indicator" id="mutexLight"></div>
 
-<div class="page">
+<!-- Auth Screen -->
+<section class="screen active" id="screen-auth">
+  <div class="auth-content">
+    <div class="auth-title">FUNKENFLUG</div>
+    <div class="auth-sub">Johanna Weber Edition v10.0 · Disziplinen System</div>
+    <div style="font-size:.85rem;color:var(--muted);margin-bottom:30px;line-height:1.6">
+      Operante Konditionierung nach B.F. Skinner.<br>Variable Ratio Schedule · Mutex-Protected
+    </div>
+    <input type="text" class="code-input" id="codeInput" placeholder="••••••••" maxlength="8">
+    <div class="hint-text">Code 26101908 für Vollzugriff + TSTBT<br>Demo: 10 Drehungen verfügbar</div>
+    <button class="btn" onclick="checkAuth()" style="margin-top:15px">Aktivieren</button>
+    <button class="btn btn-ghost" onclick="enterDemo()" style="margin-top:8px">Demo-Modus</button>
+    <div style="margin-top:30px;font-size:.65rem;color:var(--muted);font-family:var(--font-mono)">
+      I:Prüfung → II:Wissen → III:Risiko → IV:Kunst
+    </div>
+  </div>
+</section>
 
-    <!-- HEADER -->
-    <header class="header">
-        <div class="header-inner">
-            <div>
-                <div class="badge"><span>HansAssistent Pro</span><span>v3.1 PWA • LIVE</span></div>
-                <h1>Universal Master Configuration</h1>
-                <div class="subtitle">5 Perspektiven • Voll editierbar • Installierbar • Offline-fähig<br>
-                    <span style="color:var(--accent)">Stand: 12.03.2026 – PWA Edition</span>
-                </div>
-            </div>
-            <button id="installBtn">App installieren</button>
-        </div>
-        
-        <!-- Desktop Nav -->
-        <nav class="nav" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">
-            <a href="#p1" onclick="scrollToSection('p1')">P1 Identität</a>
-            <a href="#p2" onclick="scrollToSection('p2')">P2 Kompetenzen</a>
-            <a href="#p3" onclick="scrollToSection('p3')">P3 Finanzen</a>
-            <a href="#p4" onclick="scrollToSection('p4')">P4 Psychometrie</a>
-            <a href="#p5" onclick="scrollToSection('p5')">P5 Roadmap</a>
-        </nav>
-    </header>
-
-    <!-- P1 – IDENTITÄT -->
-    <section id="p1" class="card">
-        <div class="card-inner">
-            <div class="section-title">Perspektive 1</div>
-            <h2>Identität & Mathematische Kalibrierung</h2>
-            
-            <div class="grid grid-2">
-                <div>
-                    <!-- Stammdaten (editierbar) -->
-                    <h3>Profil & Rahmenbedingungen <span onclick="toggleEdit(this)" style="font-size:0.8rem;cursor:pointer;">✏️</span></h3>
-                    <table id="profileTable">
-                        <tr><td>Name</td><td contenteditable="true" onblur="saveData()">Hans‑Swathi Srikandaraja</td></tr>
-                        <tr><td>Standort</td><td contenteditable="true" onblur="saveData()">Berne, DE → Sri Lanka (Galle)</td></tr>
-                        <!-- ... weitere Zeilen wie im Original ... -->
-                    </table>
-                </div>
-                
-                <div>
-                    <h3>Mathematische Kalibrierung (0–100) – LIVE</h3>
-                    <div class="bar-chart" id="calibrationChart">
-                        <!-- Dynamische Bars werden per JS eingefügt -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- P2 – KOMPETENZEN (identisch zum Original + Bar-Animation) -->
-    <section id="p2" class="card">...</section>
-
-    <!-- P3 – FINANZEN -->
-    <section id="p3" class="card">...</section>
-
-    <!-- P4 – PSYCHOMETRIE + NEUE INTERAKTIVE DEMO -->
-    <section id="p4" class="card">
-        <div class="card-inner">
-            <h2>Projekt-Ökosystem & Psychometrie</h2>
-            
-            <!-- Original Tabelle bleibt -->
-            
-            <!-- NEUE INTERAKTIVE DEMO -->
-            <div class="demo-card" style="margin:16px 0;padding:16px;border-radius:12px;">
-                <h3>🚀 Schnelltest: Dein Enneagramm-Typ (Demo)</h3>
-                <p>Beantworte 5 Fragen – Ergebnis wird sofort gespeichert.</p>
-                <div id="quizContainer">
-                    <!-- JS füllt Fragen ein -->
-                </div>
-                <button onclick="runQuickTest()" style="margin-top:12px;background:var(--accent);color:#05060a;padding:10px 20px;border:none;border-radius:999px;">Test starten</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- P5 – ROADMAP -->
-    <section id="p5" class="card">...</section>
-
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-logo" id="hudLogo">FUNKENFLUG</div>
+  <div class="hud-center">
+    <div class="hud-label">Disziplin <span id="hudPhase">I</span></div>
+    <div class="hud-bar"><div class="hud-fill" id="hudProgress" style="width:0%"></div></div>
+  </div>
+  <div class="hud-lives" id="hudLives"><span style="font-size:1.2rem">⚡</span><span id="livesVal" style="margin-left:6px">5</span></div>
 </div>
 
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-    <a href="#p1" onclick="scrollToSection('p1');return false" class="nav-item"><span>👤</span><span>P1</span></a>
-    <a href="#p2" onclick="scrollToSection('p2');return false" class="nav-item"><span>🛠️</span><span>P2</span></a>
-    <a href="#p3" onclick="scrollToSection('p3');return false" class="nav-item"><span>💰</span><span>P3</span></a>
-    <a href="#p4" onclick="scrollToSection('p4');return false" class="nav-item"><span>🧠</span><span>P4</span></a>
-    <a href="#p5" onclick="scrollToSection('p5');return false" class="nav-item"><span>📅</span><span>P5</span></a>
+<!-- Screen: Hub -->
+<section class="screen" id="screen-hub">
+  <div class="discipline-hub">
+    <div class="hub-title">Die Vier Disziplinen</div>
+    <div class="hub-sub">Meistere jede Stufe, um die nächste zu enthüllen</div>
+    <div class="discipline-chain">
+      <div class="chain-line" id="chainLine" style="--progress:0%"></div>
+      <div class="discipline-node unlocked active" id="node1" onclick="enterDiscipline(1)">
+        <div class="node-number">I</div>
+        <div class="node-title">Die Prüfung</div>
+        <div class="node-desc">Arcade-Survival. Fange 30 Funken. 5 Leben. Variable Ratio Belohnung.</div>
+        <div class="node-reward">→ Quiz</div>
+      </div>
+      <div class="discipline-node locked" id="node2" onclick="enterDiscipline(2)">
+        <div class="node-number">II</div>
+        <div class="node-title">Das Wissen</div>
+        <div class="node-desc">Beantworte 5 Fragen. Zeitdruck. JW-Karten als Bonus.</div>
+        <div class="node-reward">→ Casino</div>
+      </div>
+      <div class="discipline-node locked" id="node3" onclick="enterDiscipline(3)">
+        <div class="node-number">III</div>
+        <div class="node-title">Das Risiko</div>
+        <div class="node-desc">Black Jack oder Würfel. Operante Konditionierung.</div>
+        <div class="node-reward">→ JW Edition</div>
+      </div>
+      <div class="discipline-node locked" id="node4" onclick="enterDiscipline(4)">
+        <div class="node-number">IV</div>
+        <div class="node-title">Die Kunst</div>
+        <div class="node-desc">Swipe-System. 4 Modi × 3 Intensitäten. TSTBT Bot-Integration.</div>
+        <div class="node-reward">Ultima</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:40px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="resetAll()">Reset</button>
+      <button class="btn btn-tech hidden" id="tstbtToggle" onclick="toggleTSTBT()">TSTBT</button>
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-editor')">Editor</button>
+    </div>
+  </div>
+</section>
+
+<!-- Screen: D1 (Arcade) -->
+<section class="screen" id="screen-d1">
+  <div class="d1-header">I · Die Prüfung</div>
+  <div class="d1-timer-wrap"><div class="d1-timer-bar" id="d1Timer"></div></div>
+  <div class="d1-count"><span id="d1Count">0</span> / 30</div>
+  <div class="d1-arena" id="d1Arena"><div class="d1-center">ZIEL</div></div>
+</section>
+
+<!-- Screen: D2 (Quiz) -->
+<section class="screen" id="screen-d2">
+  <div class="d2-header">II · Das Wissen</div>
+  <div class="d2-timer-wrap"><div class="d2-timer-bar" id="d2Timer"></div></div>
+  <div class="d2-q-num">Frage <span id="d2QNum">1</span> / 5</div>
+  <div class="d2-question" id="d2Question">...</div>
+  <div class="d2-options" id="d2Options"></div>
+</section>
+
+<!-- Screen: D3 (Casino) -->
+<section class="screen" id="screen-d3">
+  <div style="text-align:center;margin-bottom:10px">
+    <div style="font-size:.7rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase">Disziplin III</div>
+    <div style="font-family:var(--font-header);font-size:1.4rem;color:var(--gold)">Das Risiko</div>
+  </div>
+  
+  <div id="casinoMenu" class="casino-menu">
+    <div class="casino-card" onclick="startBJ()">
+      <div class="casino-icon">🃏</div>
+      <div class="casino-name">Black Jack</div>
+      <div class="casino-desc">21 ist das Ziel</div>
+    </div>
+    <div class="casino-card" onclick="startDice()">
+      <div class="casino-icon">🎲</div>
+      <div class="casino-name">Würfel</div>
+      <div class="casino-desc">7+ gewinnt</div>
+    </div>
+  </div>
+
+  <div id="bjArea" style="display:none">
+    <div class="bj-table">
+      <div class="bj-hand">
+        <div class="bj-label">Dealer</div>
+        <div class="bj-cards" id="dealerCards"></div>
+      </div>
+      <div style="text-align:center;font-family:var(--font-header);color:var(--gold);font-size:1.1rem;margin:10px 0" id="bjResult"></div>
+      <div class="bj-hand">
+        <div class="bj-label">Du</div>
+        <div class="bj-cards" id="playerCards"></div>
+      </div>
+      <div class="bj-controls">
+        <button class="btn btn-sm" onclick="bjHit()">Hit</button>
+        <button class="btn btn-ghost btn-sm" onclick="bjStand()">Stand</button>
+      </div>
+    </div>
+    <button class="btn btn-ghost" onclick="backToCasino()" style="margin-top:20px">← Zurück</button>
+  </div>
+
+  <div id="diceArea" style="display:none;text-align:center">
+    <div class="dice-box">
+      <div class="die" id="die1">?</div>
+      <div class="die" id="die2">?</div>
+    </div>
+    <button class="btn" onclick="rollDice()" style="margin:20px auto">Würfeln</button>
+    <div class="dice-result" id="diceResult"></div>
+    <button class="btn btn-ghost" onclick="backToCasino()" style="margin-top:20px">← Zurück</button>
+  </div>
+</section>
+
+<!-- Screen: D4 (JW Edition) -->
+<section class="screen" id="screen-d4">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="color:var(--crimson);font-size:.7rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:5px">Johanna Weber Edition</div>
+    <div style="font-family:var(--font-header);font-size:1.4rem;color:var(--gold)">Die Kunst</div>
+  </div>
+
+  <div class="jw-tabs">
+    <div class="jw-tab active" onclick="setMode('gift')" id="tab-gift">Geschenk</div>
+    <div class="jw-tab" onclick="setMode('inspection')" id="tab-inspection">Inspektion</div>
+    <div class="jw-tab" onclick="setMode('trio')" id="tab-trio">Trio</div>
+    <div class="jw-tab" onclick="setMode('control')" id="tab-control">Kontrolle</div>
+  </div>
+
+  <div class="intensity-row">
+    <button class="intensity-btn active" onclick="setIntensity(1)">1</button>
+    <button class="intensity-btn" onclick="setIntensity(2)">2</button>
+    <button class="intensity-btn" onclick="setIntensity(3)">3</button>
+  </div>
+
+  <div class="swipe-arena" id="swipeArena">
+    <div class="swipe-card" id="activeCard">
+      <div class="card-cat" id="cardCat">BEREIT</div>
+      <div class="card-title" id="cardTitle">Johanna Weber Edition</div>
+      <div class="card-text" id="cardText">Swipe nach rechts für ZIEHEN, links für ÜBERSPRINGEN</div>
+    </div>
+    <div class="swipe-hint" id="swipeHint">
+      <div class="hint-left">✕</div>
+      <div class="hint-right">✓</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:15px;margin-bottom:20px;justify-content:center">
+    <button class="btn" onclick="drawCard()" style="flex:2">🎴 Karte Ziehen</button>
+    <button class="btn btn-gold" onclick="showWheel()" style="flex:1">🎯 Rad</button>
+  </div>
+
+  <div class="players-section">
+    <div class="section-title">Teilnehmer <span id="playerCount">(1)</span></div>
+    <div class="players-container" id="playersContainer"></div>
+  </div>
+
+  <div class="tstbt-panel" id="tstbtPanel">
+    <div class="tstbt-header">
+      <div class="tstbt-title">🤖 TSTBT v7.1</div>
+      <span style="font-size:11px;color:var(--tech-magenta)">Mutex-Protected</span>
+    </div>
+    <div class="test-controls">
+      <button class="test-btn" onclick="initBotArmy()">Init 30 Bots</button>
+      <button class="test-btn" onclick="stressTest()">Stress Test</button>
+      <button class="test-btn" onclick="raceTest()">Race Check</button>
+      <button class="test-btn danger" onclick="clearBots()">Reset All</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box"><span class="stat-value" id="statBots">0</span><div class="stat-label">Bots</div></div>
+      <div class="stat-box"><span class="stat-value" id="statTests">0</span><div class="stat-label">Tests</div></div>
+      <div class="stat-box"><span class="stat-value" id="statBugs">0</span><div class="stat-label">Bugs</div></div>
+    </div>
+    <div class="log-console" id="logConsole"><div class="log-entry">System ready...</div></div>
+  </div>
+
+  <div style="text-align:center;color:var(--muted);font-size:.8em;margin-top:10px">
+    Aktiv: <span id="currentPlayerDisplay">Spieler 1</span> | 
+    <span id="systemStatus">Normal</span>
+  </div>
+</section>
+
+<!-- Screen: Editor -->
+<section class="screen" id="screen-editor">
+  <div style="text-align:center;margin-bottom:20px"><div class="hub-title">Content Editor</div></div>
+  <div class="editor-tabs">
+    <button class="editor-tab active" onclick="edTab('jw')">JW Cards</button>
+    <button class="editor-tab" onclick="edTab('quiz')">Quiz</button>
+  </div>
+  
+  <div class="editor-section active" id="ed-jw">
+    <div class="item-list" id="jwList"></div>
+    <div class="add-form">
+      <div class="form-row">
+        <label class="form-label">Modus</label>
+        <select class="form-select" id="edMode">
+          <option value="gift">Geschenkband</option>
+          <option value="inspection">Inspektion</option>
+          <option value="trio">Trio</option>
+          <option value="control">Kontrolle</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Stufe (1-3)</label>
+        <select class="form-select" id="edInt"><option>1</option><option>2</option><option>3</option></select>
+      </div>
+      <div class="form-row"><textarea class="form-textarea" id="edText" placeholder="Karten-Text..."></textarea></div>
+      <button class="btn btn-green" onclick="addJwCard()" style="width:100%">Hinzufügen</button>
+    </div>
+  </div>
+  
+  <div class="editor-section" id="ed-quiz">
+    <div class="item-list" id="quizList"></div>
+    <div class="add-form">
+      <div class="form-row"><input class="form-input" id="edQ" placeholder="Frage"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px">
+        <input class="form-input" id="edA0" placeholder="Richtig (A)">
+        <input class="form-input" id="edA1" placeholder="B">
+        <input class="form-input" id="edA2" placeholder="C">
+        <input class="form-input" id="edA3" placeholder="D">
+      </div>
+      <button class="btn btn-green" onclick="addQuiz()" style="width:100%">+ Frage</button>
+    </div>
+  </div>
+  
+  <button class="btn btn-ghost" onclick="showScreen('screen-hub')" style="margin-top:30px">← Zurück</button>
+</section>
+
+<!-- Wheel Overlay -->
+<div class="wheel-overlay" id="wheelOverlay">
+  <div style="text-align:center">
+    <div style="font-family:var(--font-header);color:var(--gold);font-size:1.2rem;margin-bottom:20px">Variable bestimmen</div>
+    <div class="wheel-container">
+      <div class="wheel-pointer"></div>
+      <div class="wheel" id="wheel">
+        <div class="wheel-center">JW</div>
+      </div>
+    </div>
+    <button class="btn" onclick="spinWheel()" style="margin-top:30px;width:200px">Drehen</button>
+    <button class="btn btn-ghost" onclick="hideWheel()" style="margin-top:10px;width:200px">Schließen</button>
+  </div>
 </div>
+
+<!-- Message Overlay -->
+<div class="msg-overlay" id="msgOverlay">
+  <div class="msg-title" id="msgTitle">—</div>
+  <div class="msg-body" id="msgBody">—</div>
+  <button class="btn" onclick="closeMsg()" style="margin-top:8px">Verstanden</button>
+</div>
+
+<!-- Freeze Effect -->
+<div class="freeze-overlay" id="freezeOverlay"></div>
 
 <script>
-    // ===== PWA INSTALL PROMPT =====
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
+// === MUTEX SYSTEM ===
+const Mutex={
+  locked:false,
+  queue:[],
+  async acquire(){if(this.locked)return new Promise(r=>this.queue.push(r));this.locked=true;updateMutex();return Promise.resolve()},
+  release(){this.locked=false;updateMutex();if(this.queue.length>0){const next=this.queue.shift();this.locked=true;updateMutex();next()}},
+  isLocked(){return this.locked}
+};
+function updateMutex(){
+  const el=document.getElementById('mutexLight');
+  if(Mutex.isLocked())el.classList.add('locked');else el.classList.remove('locked');
+}
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installBtn.style.display = 'block';
+// === STATE ===
+const State={
+  auth:false,demo:false,trialSpins:10,
+  progress:{discipline:1,unlocked:[true,false,false,false],mastered:[false,false,false,false]},
+  arcade:{active:false,score:0,lives:5,lane:1,enemies:[],target:30,timeLeft:60,interval:null,spawnInt:null},
+  quiz:{current:0,questions:[],timer:null,timeLeft:15},
+  casino:{deck:[],player:[],dealer:[],done:false},
+  jw:{mode:'gift',intensity:1,currentCard:null,players:[{id:0,name:'Spieler 1',type:'human',score:0,status:'active',latency:0}],currentPlayer:0},
+  tstbt:{tests:0,bugs:0},
+  wheel:{angle:0,spinning:false,segs:['+50 Pkt','×2 Multi','Skip D1','Reset','Bots','+30','+20','+10']}
+};
+
+// === DATA ===
+const Questions=[
+  {q:"Was beschreibt das Prinzip der operanten Konditionierung?",a:["Lernen durch Konsequenzen","Lernen durch Beobachtung","Reflexartige Reaktionen","Kognitive Überlastung"],c:0},
+  {q:"Wer entwickelte das Konzept der Verstärkungspläne?",a:["B.F. Skinner","Sigmund Freud","Carl Jung","Ivan Pawlow"],c:0},
+  {q:"Welcher Verstärkungsplan erzeugt die höchste Resistenz gegen Löschung?",a:["Variable-Ratio-Plan","Fester Intervall","Feste Ratio","Variabler Intervall"],c:0},
+  {q:"Was bedeutet 'aversiver Stimulus'?",a:["Ein unangenehmer Reiz zur Verhaltensunterdrückung","Ein positiver Anreiz","Neutrale Konditionierung","Spontane Erholung"],c:0},
+  {q:"Was ist Dopamin im Kontext von Belohnungssystemen?",a:["Ein Neurotransmitter, der Erwartung verstärkt","Ein Stresshormon","Ein Enzym","Ein Gedächtnisprotein"],c:0},
+  {q:"Was versteht man unter 'Diskriminations-Training'?",a:["Unterscheidung zwischen Reizen, die Belohnung auslösen","Zufälliges Verhalten","Systematische Bestrafung","Negative Verstärkung"],c:0},
+  {q:"In der Casino-Mathematik: Was ist der 'House Edge'?",a:["Der mathematische Vorteil des Hauses","Die maximale Auszahlung","Der Jackpot-Schwellenwert","Die Deckungslimit"],c:0},
+  {q:"Was beschreibt der Begriff 'Flow-State' in der Spielpsychologie?",a:["Optimale Herausforderung trifft maximale Fähigkeit","Totale Erschöpfung","Zufälliges Engagement","Kognitive Überforderung"],c:0}
+];
+
+const JwCards={
+  gift:[
+    {t:"Binde dir das Band um die Augen. 3 Minuten 'Dekoration'.",i:1},
+    {t:"Du bist das Geschenk. Werde langsam 'ausgepackt'.",i:1},
+    {t:"Mit Band gefesselt. 2 Minuten schweigende Betrachtung.",i:2},
+    {t:"Beschreibe laut, wie es sich anfühlt, Geschenk zu sein.",i:2},
+    {t:"Vollständig verbunden, während andere genießen.",i:3}
+  ],
+  inspection:[
+    {t:"Stell dich in die Mitte. Inspektion ohne Berührung.",i:1},
+    {t:"Augenbinden-Inspektion. Du weißt nie, wo hingeschaut wird.",i:2},
+    {t:"5 Minuten Bewegungslosigkeit während die andere Person agiert.",i:3},
+    {t:"Zeige, wie du dich selbst berührst – unter Anleitung.",i:3}
+  ],
+  trio:[
+    {t:"Zwei gegen Eins: Abwechselnd bestimmen die anderen.",i:2},
+    {t:"Du wirst von hinten gehalten, während du zuschaust.",i:3},
+    {t:"Wettstreit: Wer bringt dich schneller zum Stöhnen?",i:3}
+  ],
+  control:[
+    {t:"Tease & Denial: Fast zum Höhepunkt, dann 3 Min Pause.",i:2},
+    {t:"Die Melkmaschine: Rhythmisches Ritual. Keine Emotion.",i:3},
+    {t:"Du darfst dich selbst berühren, nur im vorgegebenen Tempo.",i:2}
+  ]
+};
+
+// === CORE FUNCTIONS ===
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none'});
+  document.getElementById(id).style.display='flex';
+  setTimeout(()=>document.getElementById(id).classList.add('active'),50);
+  if(id!=='screen-auth')document.getElementById('hud').style.display='flex';
+  else document.getElementById('hud').style.display='none';
+}
+
+function showMsg(t,b){document.getElementById('msgTitle').textContent=t;document.getElementById('msgBody').textContent=b;document.getElementById('msgOverlay').classList.add('active')}
+function closeMsg(){document.getElementById('msgOverlay').classList.remove('active')}
+function flash(){const f=document.getElementById('freezeOverlay');f.classList.add('active');setTimeout(()=>f.classList.remove('active'),600)}
+
+// === AUTH ===
+function checkAuth(){
+  const code=document.getElementById('codeInput').value;
+  if(code==='26101908'){
+    State.auth=true;State.demo=false;
+    State.progress.unlocked=[true,true,true,true];
+    document.getElementById('codeInput').classList.add('unlocked');
+    document.getElementById('tstbtToggle').classList.remove('hidden');
+    setTimeout(()=>{showScreen('screen-hub');updateHub()},500);
+  }else{
+    showMsg('Falscher Code','Versuche 26101908 oder starte Demo.','❌');
+  }
+}
+
+function enterDemo(){
+  State.demo=true;State.trialSpins=10;State.auth=false;
+  State.progress.unlocked=[true,false,false,false];
+  showMsg('Demo-Modus','10 Drehungen verfügbar. Code für Vollzugriff: 26101908','🎮');
+  setTimeout(()=>{closeMsg();showScreen('screen-hub');updateHub()},1500);
+}
+
+// === HUB ===
+function updateHub(){
+  const p=State.progress;
+  const pct=((p.discipline-1)/3)*100;
+  document.getElementById('chainLine').style.setProperty('--progress',pct+'%');
+  document.getElementById('hudProgress').style.width=pct+'%';
+  document.getElementById('hudPhase').textContent=['I','II','III','IV'][p.discipline-1];
+  document.getElementById('livesVal').textContent=State.arcade.lives;
+  
+  for(let i=1;i<=4;i++){
+    const n=document.getElementById('node'+i);
+    n.className='discipline-node';
+    if(p.unlocked[i-1])n.classList.add('unlocked');
+    else n.classList.add('locked');
+    if(i===p.discipline)n.classList.add('active');
+    if(p.mastered[i-1])n.classList.add('mastered');
+  }
+  
+  const livesEl=document.getElementById('hudLives');
+  if(State.arcade.lives<=2)livesEl.classList.add('danger');else livesEl.classList.remove('danger');
+}
+
+function enterDiscipline(n){
+  if(!State.progress.unlocked[n-1])return;
+  State.progress.discipline=n;
+  updateHub();
+  
+  if(n===1)startD1();
+  else if(n===2)startD2();
+  else if(n===3)startD3();
+  else if(n===4)startD4();
+}
+
+// === D1: ARCADE ===
+function startD1(){
+  showScreen('screen-d1');
+  State.arcade={active:true,score:0,lives:5,lane:1,enemies:[],target:30,timeLeft:60,interval:null,spawnInt:null};
+  updateHub();
+  
+  const arena=document.getElementById('d1Arena');
+  arena.innerHTML='<div class="d1-center">ZIEL</div>';
+  document.getElementById('d1Count').textContent='0 / 30';
+  
+  // Timer
+  State.arcade.interval=setInterval(()=>{
+    State.arcade.timeLeft--;
+    const pct=(State.arcade.timeLeft/60)*100;
+    const bar=document.getElementById('d1Timer');
+    bar.style.width=pct+'%';
+    bar.style.background=pct>40?'var(--gold)':pct>20?'orange':'var(--crimson)';
+    if(State.arcade.timeLeft<=0)endD1(false);
+  },1000);
+  
+  // Spawner
+  spawnSpark();
+  scheduleNextSpark();
+}
+
+function scheduleNextSpark(){
+  const delay=Math.random()*2000+800;
+  State.arcade.spawnInt=setTimeout(()=>{
+    if(State.arcade.active)spawnSpark();
+  },delay);
+}
+
+let activeSpark=null;
+function spawnSpark(){
+  if(activeSpark)return;
+  const arena=document.getElementById('d1Arena');
+  const spark=document.createElement('div');
+  spark.className='spark';
+  spark.innerHTML='<div class="spark-inner"></div>';
+  
+  const w=arena.clientWidth,h=arena.clientHeight;
+  const side=Math.floor(Math.random()*4);
+  let x,y;
+  if(side===0){x=Math.random()*(w-44);y=0;}
+  else if(side===1){x=w-44;y=Math.random()*(h-44);}
+  else if(side===2){x=Math.random()*(w-44);y=h-44;}
+  else{x=0;y=Math.random()*(h-44);}
+  
+  spark.style.left=x+'px';spark.style.top=y+'px';
+  arena.appendChild(spark);
+  activeSpark=spark;
+  
+  // Drag logic
+  let dragging=false,startX,startY;
+  const onStart=e=>{
+    dragging=true;
+    const t=e.touches?e.touches[0]:e;
+    const rect=spark.getBoundingClientRect();
+    startX=t.clientX-rect.left;startY=t.clientY-rect.top;
+    e.preventDefault();
+  };
+  const onMove=e=>{
+    if(!dragging)return;
+    const t=e.touches?e.touches[0]:e;
+    const arect=arena.getBoundingClientRect();
+    const nx=t.clientX-arect.left-startX;
+    const ny=t.clientY-arect.top-startY;
+    spark.style.left=nx+'px';spark.style.top=ny+'px';
+    checkCatch(nx,ny);
+    e.preventDefault();
+  };
+  const onEnd=()=>{dragging=false};
+  
+  spark.addEventListener('touchstart',onStart,{passive:false});
+  document.addEventListener('touchmove',onMove,{passive:false});
+  document.addEventListener('touchend',onEnd);
+  spark.addEventListener('mousedown',onStart);
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onEnd);
+  
+  // Expire
+  setTimeout(()=>{
+    if(activeSpark===spark){
+      spark.remove();activeSpark=null;
+      loseLife();
+      scheduleNextSpark();
+    }
+  },3000);
+}
+
+function checkCatch(nx,ny){
+  const arena=document.getElementById('d1Arena');
+  const cx=arena.clientWidth/2-22,cy=arena.clientHeight/2-22;
+  const dist=Math.sqrt((nx-cx)**2+(ny-cy)**2);
+  if(dist<50){
+    activeSpark.remove();activeSpark=null;
+    State.arcade.score++;
+    document.getElementById('d1Count').textContent=State.arcade.score+' / 30';
+    if(State.arcade.score>=30)endD1(true);
+    else scheduleNextSpark();
+  }
+}
+
+function loseLife(){
+  State.arcade.lives--;
+  flash();
+  updateHub();
+  if(State.arcade.lives<=0)endD1(false);
+}
+
+function endD1(win){
+  State.arcade.active=false;
+  clearInterval(State.arcade.interval);
+  clearTimeout(State.arcade.spawnInt);
+  if(win){
+    State.progress.unlocked[1]=true;
+    State.progress.mastered[0]=true;
+    showMsg('✦ Bestanden','Du hast 30 Funken eingefangen. Das Wissen wartet.','✅');
+    setTimeout(()=>{closeMsg();enterDiscipline(2)},2000);
+  }else{
+    showMsg('✦ Gescheitert','Die Funken sind entkommen. Versuche es erneut.','💀');
+    setTimeout(()=>{closeMsg();showScreen('screen-hub')},2000);
+  }
+}
+
+// === D2: QUIZ ===
+function startD2(){
+  showScreen('screen-d2');
+  State.quiz.current=0;
+  State.quiz.questions=shuffle([...Questions]).slice(0,5);
+  showQuestion();
+}
+
+function showQuestion(){
+  if(State.quiz.current>=5){
+    if(State.quiz.correct>=4){
+      State.progress.unlocked[2]=true;
+      State.progress.mastered[1]=true;
+      showMsg('✦ Bestanden','Das Risiko ist nun freigeschaltet.','📚');
+      setTimeout(()=>{closeMsg();enterDiscipline(3)},2000);
+    }else{
+      showMsg('✦ Durchgefallen','Zu viele Fehler. Zurück zur Prüfung.','❌');
+      setTimeout(()=>{closeMsg();enterDiscipline(1)},2000);
+    }
+    return;
+  }
+  
+  const q=State.quiz.questions[State.quiz.current];
+  document.getElementById('d2QNum').textContent=State.quiz.current+1;
+  document.getElementById('d2Question').textContent=q.q;
+  const opts=document.getElementById('d2Options');
+  opts.innerHTML='';
+  
+  q.a.forEach((ans,idx)=>{
+    const btn=document.createElement('div');
+    btn.className='d2-option';
+    btn.textContent=ans;
+    btn.onclick=()=>answerD2(idx);
+    opts.appendChild(btn);
+  });
+  
+  // Timer
+  State.quiz.timeLeft=15;
+  const timerBar=document.getElementById('d2Timer');
+  timerBar.style.width='100%';
+  clearInterval(State.quiz.timer);
+  State.quiz.timer=setInterval(()=>{
+    State.quiz.timeLeft--;
+    timerBar.style.width=(State.quiz.timeLeft/15*100)+'%';
+    if(State.quiz.timeLeft<=0){
+      clearInterval(State.quiz.timer);
+      answerD2(-1);
+    }
+  },1000);
+}
+
+function answerD2(idx){
+  clearInterval(State.quiz.timer);
+  const q=State.quiz.questions[State.quiz.current];
+  const opts=document.querySelectorAll('.d2-option');
+  opts.forEach((o,i)=>{
+    o.onclick=null;
+    if(i===q.c)o.classList.add('correct');
+    else if(i===idx)o.classList.add('wrong');
+  });
+  if(idx===q.c)State.quiz.correct++;
+  setTimeout(()=>{State.quiz.current++;showQuestion()},1500);
+}
+
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+
+// === D3: CASINO ===
+function startD3(){
+  showScreen('screen-d3');
+  document.getElementById('casinoMenu').style.display='grid';
+  document.getElementById('bjArea').style.display='none';
+  document.getElementById('diceArea').style.display='none';
+}
+
+function backToCasino(){
+  document.getElementById('bjArea').style.display='none';
+  document.getElementById('diceArea').style.display='none';
+  document.getElementById('casinoMenu').style.display='grid';
+}
+
+// Blackjack
+function startBJ(){
+  document.getElementById('casinoMenu').style.display='none';
+  document.getElementById('bjArea').style.display='block';
+  State.casino.deck=createDeck();
+  State.casino.player=[draw(),draw()];
+  State.casino.dealer=[draw(),draw()];
+  State.casino.done=false;
+  renderBJ();
+}
+
+function createDeck(){
+  const s=['♠','♥','♣','♦'],v=['2','3','4','5','6','7','8','9','10','B','D','K','A'];
+  let d=[];for(let su of s)for(let va of v)d.push({s:su,v:va,n:parseInt(va)||(va==='A'?11:10)});
+  return d.sort(()=>Math.random()-.5);
+}
+
+function draw(){return State.casino.deck.pop()}
+function calc(h){let s=h.reduce((a,c)=>a+c.n,0);let ac=h.filter(x=>x.v==='A').length;while(s>21&&ac--)s-=10;return s}
+
+function renderBJ(){
+  const r=c=>`<div class="playing-card ${c.s==='♥'||c.s==='♦'?'red':''}">${c.v}${c.s}</div>`;
+  document.getElementById('playerCards').innerHTML=State.casino.player.map(r).join('');
+  document.getElementById('dealerCards').innerHTML=State.casino.dealer.map((c,i)=>i===1&&!State.casino.done?'<div class="playing-card" style="background:linear-gradient(135deg,#333,#111);color:white">?</div>':r(c)).join('');
+  
+  const pc=calc(State.casino.player);
+  if(State.casino.done){
+    const dc=calc(State.casino.dealer);
+    let msg='';
+    if(pc>21)msg='Bust! Verloren.';
+    else if(dc>21||pc>dc){msg='Gewonnen! JW freigeschaltet.';State.progress.unlocked[3]=true;State.progress.mastered[2]=true;}
+    else if(pc<dc)msg='Verloren.';
+    else msg='Push';
+    document.getElementById('bjResult').textContent=msg;
+    if(pc<=21&&(dc>21||pc>dc)){
+      setTimeout(()=>{showMsg('🎉 Jackpot!','JW Edition ist freigeschaltet.');setTimeout(()=>{closeMsg();enterDiscipline(4)},1500)},1000);
+    }
+  }else{
+    document.getElementById('bjResult').textContent='Punkte: '+pc;
+  }
+}
+
+function bjHit(){
+  State.casino.player.push(draw());
+  if(calc(State.casino.player)>21){State.casino.done=true;renderBJ()}
+  else renderBJ();
+}
+
+function bjStand(){
+  State.casino.done=true;
+  let d=calc(State.casino.dealer);
+  while(d<17){State.casino.dealer.push(draw());d=calc(State.casino.dealer)}
+  renderBJ();
+}
+
+// Dice
+function startDice(){
+  document.getElementById('casinoMenu').style.display='none';
+  document.getElementById('diceArea').style.display='block';
+  document.getElementById('die1').textContent='?';
+  document.getElementById('die2').textContent='?';
+  document.getElementById('diceResult').textContent='';
+}
+
+function rollDice(){
+  const d1=document.getElementById('die1'),d2=document.getElementById('die2');
+  d1.classList.add('rolling');d2.classList.add('rolling');
+  
+  setTimeout(()=>{
+    const v1=Math.floor(Math.random()*6)+1;
+    const v2=Math.floor(Math.random()*6)+1;
+    d1.textContent=v1;d2.textContent=v2;
+    d1.classList.remove('rolling');d2.classList.remove('rolling');
+    const sum=v1+v2;
+    let msg='';
+    if(sum>=10){
+      msg='🎉 Jackpot! JW Edition freigeschaltet!';
+      State.progress.unlocked[3]=true;State.progress.mastered[2]=true;
+      setTimeout(()=>{showMsg('Freigeschaltet','Willkommen in der JW Edition.');setTimeout(()=>{closeMsg();enterDiscipline(4)},1500)},500);
+    }else if(sum>=7)msg='Gewonnen, aber knapp.';
+    else msg='Pech. Versuche es erneut.';
+    document.getElementById('diceResult').textContent='Summe '+sum+': '+msg;
+  },600);
+}
+
+// === D4: JW EDITION ===
+function startD4(){
+  if(State.demo&&State.trialSpins<=0){showMsg('Demo beendet','Keine Drehungen mehr. Code: 26101908');return}
+  showScreen('screen-d4');
+  if(State.auth)document.getElementById('tstbtPanel').classList.add('active');
+  initSwipe();
+  renderPlayers();
+  updateJwUI();
+}
+
+function setMode(m){
+  State.jw.mode=m;
+  document.querySelectorAll('.jw-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+m).classList.add('active');
+  document.getElementById('cardCat').textContent=m.toUpperCase();
+  document.getElementById('cardTitle').textContent='Bereit';
+  document.getElementById('cardText').textContent='Ziehe eine Karte oder drehe das Rad.';
+}
+
+function setIntensity(l){
+  State.jw.intensity=l;
+  document.querySelectorAll('.intensity-btn').forEach((b,i)=>b.classList.toggle('active',i+1===l));
+}
+
+function updateJwUI(){
+  document.getElementById('playerCount').textContent='('+State.jw.players.length+')';
+  document.getElementById('currentPlayerDisplay').textContent=State.jw.players[State.jw.currentPlayer].name;
+}
+
+function initSwipe(){
+  const card=document.getElementById('activeCard');
+  const hint=document.getElementById('swipeHint');
+  let startX=0,currentX=0,dragging=false;
+  
+  const onStart=e=>{
+    dragging=true;card.classList.add('dragging');
+    startX=e.type.includes('touch')?e.touches[0].clientX:e.clientX;
+    e.preventDefault();
+  };
+  
+  const onMove=e=>{
+    if(!dragging)return;e.preventDefault();
+    currentX=e.type.includes('touch')?e.touches[0].clientX:e.clientX;
+    const delta=currentX-startX;
+    card.style.transform='translate(calc(-50% + '+delta+'px),-50%) rotate('+(delta*.1)+'deg)';
+    if(delta<-50)hint.querySelector('.hint-left').style.opacity=Math.min(Math.abs(delta)/100,1);
+    else if(delta>50)hint.querySelector('.hint-right').style.opacity=Math.min(delta/100,1);
+    else{hint.querySelector('.hint-left').style.opacity=0;hint.querySelector('.hint-right').style.opacity=0}
+  };
+  
+  const onEnd=()=>{
+    if(!dragging)return;dragging=false;card.classList.remove('dragging');
+    const delta=currentX-startX;
+    if(delta<-100){card.classList.add('reject');log('Karte übersprungen','warn');setTimeout(nextCard,300)}
+    else if(delta>100){card.classList.add('accept');log('Karte angenommen','success');updatePlayerScore(10);setTimeout(nextCard,300)}
+    else{card.style.transform='';hint.querySelector('.hint-left').style.opacity=0;hint.querySelector('.hint-right').style.opacity=0}
+  };
+  
+  card.addEventListener('touchstart',onStart,{passive:false});
+  card.addEventListener('touchmove',onMove,{passive:false});
+  card.addEventListener('touchend',onEnd);
+  card.addEventListener('mousedown',onStart);
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onEnd);
+}
+
+function nextCard(){
+  const card=document.getElementById('activeCard');
+  card.style.transition='none';card.classList.remove('reject','accept');
+  card.style.transform='';card.style.opacity='0';
+  hint.querySelector('.hint-left').style.opacity=0;hint.querySelector('.hint-right').style.opacity=0;
+  
+  const pool=JwCards[State.jw.mode].filter(c=>c.i<=State.jw.intensity);
+  if(pool.length===0){
+    document.getElementById('cardText').textContent='Keine Karten für diese Stufe verfügbar.';
+  }else{
+    const c=pool[Math.floor(Math.random()*pool.length)];
+    document.getElementById('cardCat').textContent=State.jw.mode.toUpperCase()+' · Stufe '+c.i;
+    document.getElementById('cardTitle').textContent='Neue Aufgabe';
+    document.getElementById('cardText').textContent=c.t;
+  }
+  
+  setTimeout(()=>{card.style.transition='transform .3s,opacity .3s';card.style.opacity='1'},50);
+  if(State.demo){State.trialSpins--;if(State.trialSpins===0)showMsg('Demo Ende','Keine Drehungen mehr.')}
+  State.jw.currentPlayer=(State.jw.currentPlayer+1)%State.jw.players.length;
+  updateJwUI();
+  renderPlayers();
+}
+
+function drawCard(){nextCard()}
+
+function showWheel(){document.getElementById('wheelOverlay').classList.add('active')}
+function hideWheel(){document.getElementById('wheelOverlay').classList.remove('active')}
+function spinWheel(){
+  const w=document.getElementById('wheel');
+  const rot=5*360+Math.random()*360;
+  w.style.transform='rotate('+rot+'deg)';
+  if(navigator.vibrate)navigator.vibrate([50,50,50,50,100]);
+  setTimeout(()=>{
+    const seg=State.wheel.segs[Math.floor(Math.random()*State.wheel.segs.length)];
+    log('Rad: '+seg,'success');
+    if(seg==='Bots'&&State.auth)initBotArmy();
+  },4000);
+}
+
+// === TSTBT ===
+function log(m,t){
+  const c=document.getElementById('logConsole');
+  const e=document.createElement('div');e.className='log-entry '+(t||'');e.textContent='['+new Date().toLocaleTimeString()+'] '+m;
+  c.appendChild(e);c.scrollTop=c.scrollHeight;
+}
+
+async function initBotArmy(){
+  await Mutex.acquire();
+  log('Initializing 30 Bot Army...','warn');
+  State.jw.players=State.jw.players.filter(p=>p.type!=='bot');
+  let added=0;
+  const int=setInterval(()=>{
+    if(added>=30){clearInterval(int);document.getElementById('statBots').textContent=30;log('30 Bots active','success');Mutex.release();renderPlayers();return}
+    State.jw.players.push({id:added+100,name:'Bot-'+Math.floor(Math.random()*1000),type:'bot',score:Math.floor(Math.random()*50),status:'testing',latency:Math.floor(Math.random()*200)});
+    added++;if(added%10===0)renderPlayers();
+  },50);
+}
+
+function stressTest(){
+  log('Stress Test 500 rounds...','warn');
+  let rounds=0;
+  const int=setInterval(()=>{
+    if(rounds>=500){clearInterval(int);State.tstbt.tests++;document.getElementById('statTests').textContent=State.tstbt.tests;log('Stress completed','success');return}
+    const p=State.jw.players[Math.floor(Math.random()*State.jw.players.length)];
+    if(p){p.score+=Math.floor(Math.random()*10);p.latency=Math.floor(Math.random()*500)}
+    rounds++;
+  },10);
+}
+
+function raceTest(){
+  log('Testing Race Conditions...','warn');
+  let c=0,r=0;
+  for(let i=0;i<10;i++){
+    setTimeout(()=>{
+      Mutex.acquire().then(()=>{
+        renderPlayers();
+        setTimeout(()=>{Mutex.release();r++;if(r===10){log('Races resolved: '+c,'success');if(c>0)State.tstbt.bugs++;document.getElementById('statBugs').textContent=State.tstbt.bugs}},Math.random()*100);
+        if(Mutex.isLocked()&&i>0)c++;
+      });
+    },i*5);
+  }
+}
+
+function clearBots(){
+  State.jw.players=State.jw.players.filter(p=>p.type!=='bot');
+  if(State.jw.players.length===0)State.jw.players=[{id:0,name:'Spieler 1',type:'human',score:0,status:'active',latency:0}];
+  renderPlayers();document.getElementById('statBots').textContent='0';
+  log('Bots cleared','success');
+}
+
+function renderPlayers(){
+  const c=document.getElementById('playersContainer');
+  c.innerHTML='';
+  State.jw.players.forEach((p,i)=>{
+    const div=document.createElement('div');
+    div.className='player-card '+(p.type==='bot'?'bot':'');
+    div.style.borderLeftColor=p.status==='active'?var(--em):p.status==='error'?var(--ruby):var(--gold);
+    div.innerHTML='<div class="player-main"><span class="player-dot" style="background:'+(p.status==='active'?'var(--em)':p.status==='error'?'var(--ruby)':'var(--gold)')+'"></span><span class="player-name">'+p.name+'</span>'+(p.type==='bot'?'<span class="bot-badge">BOT</span>':'')+'</div><div class="player-metrics"><span>'+p.score+' P</span><span>'+p.latency+'ms</span></div>';
+    c.appendChild(div);
+  });
+}
+
+function updatePlayerScore(pts){
+  const p=State.jw.players[State.jw.currentPlayer];
+  if(p){p.score+=pts;renderPlayers()}
+}
+
+function toggleTSTBT(){
+  const p=document.getElementById('tstbtPanel');
+  p.classList.toggle('active');
+  if(p.classList.contains('active'))log('TSTBT Panel opened');
+}
+
+// === EDITOR ===
+function edTab(t){
+  document.querySelectorAll('.editor-tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.editor-section').forEach(x=>x.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('ed-'+t).classList.add('active');
+  if(t==='jw')renderJwList();if(t==='quiz')renderQuizList();
+}
+
+function renderJwList(){
+  const l=document.getElementById('jwList');
+  l.innerHTML='';
+  Object.keys(JwCards).forEach(m=>{
+    JwCards[m].forEach((c,i)=>{
+      const d=document.createElement('div');d.className='item-card';
+      d.innerHTML='<div style="font-size:.6rem;color:var(--gold);text-transform:uppercase;margin-bottom:4px">'+m+' · Stufe '+c.i+'</div><div>'+c.t+'</div><button class="del" onclick="delJw(\''+m+'\','+i+')">×</button>';
+      l.appendChild(d);
     });
+  });
+}
 
-    installBtn.addEventListener('click', () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(() => { installBtn.style.display = 'none'; });
-        }
-    });
+function renderQuizList(){
+  const l=document.getElementById('quizList');
+  l.innerHTML='';
+  Questions.forEach((q,i)=>{
+    const d=document.createElement('div');d.className='item-card';
+    d.innerHTML='<div style="font-size:.6rem;color:var(--gold);text-transform:uppercase;margin-bottom:4px">Frage '+(i+1)+'</div><div>'+q.q+'</div><button class="del" onclick="delQuiz('+i+')">×</button>';
+    l.appendChild(d);
+  });
+}
 
-    // ===== SERVICE WORKER (Single-File PWA) =====
-    if ('serviceWorker' in navigator) {
-        const swCode = `
-            const CACHE = 'hansassistent-v3.1';
-            self.addEventListener('install', e => {
-                e.waitUntil(caches.open(CACHE).then(cache => cache.addAll(['./'])));
-            });
-            self.addEventListener('fetch', e => {
-                e.respondWith(caches.match(e.request).then(response => response || fetch(e.request)));
-            });
-        `;
-        const blob = new Blob([swCode], {type: 'application/javascript'});
-        const swURL = URL.createObjectURL(blob);
-        
-        navigator.serviceWorker.register(swURL).then(() => {
-            console.log('%c✅ HansAssistent Pro PWA ready – offline-fähig!', 'color:#f5b642;font-weight:700');
-        });
-    }
+function addJwCard(){
+  const m=document.getElementById('edMode').value;
+  const i=parseInt(document.getElementById('edInt').value);
+  const t=document.getElementById('edText').value;
+  if(!t)return;
+  JwCards[m].push({t:t,i:i});
+  document.getElementById('edText').value='';
+  renderJwList();
+}
 
-    // ===== LOCALSTORAGE + LIVE CHARTS =====
-    let calibrationData = JSON.parse(localStorage.getItem('calibrationData')) || {
-        risiko: 78, autonomie: 85, struktur: 72, praecision: 88
-    };
+function delJw(m,i){JwCards[m].splice(i,1);renderJwList()}
+function addQuiz(){
+  const q=document.getElementById('edQ').value;
+  const a=[document.getElementById('edA0').value,document.getElementById('edA1').value,document.getElementById('edA2').value,document.getElementById('edA3').value];
+  if(!q||!a[0])return;
+  Questions.push({q:q,a:a,c:0});
+  document.getElementById('edQ').value='';['edA0','edA1','edA2','edA3'].forEach(id=>document.getElementById(id).value='');
+  renderQuizList();
+}
+function delQuiz(i){Questions.splice(i,1);renderQuizList()}
 
-    function renderCalibrationChart() {
-        const container = document.getElementById('calibrationChart');
-        container.innerHTML = `
-            <div class="bar-row" data-value="\( {calibrationData.risiko}"><div class="bar-label"><span>Risikobereitschaft</span><span> \){calibrationData.risiko}</span></div><div class="bar-track"><div class="bar-fill" style="width:${calibrationData.risiko}%"></div></div></div>
-            <div class="bar-row" data-value="\( {calibrationData.autonomie}"><div class="bar-label"><span>Autonomie</span><span> \){calibrationData.autonomie}</span></div><div class="bar-track"><div class="bar-fill" style="width:${calibrationData.autonomie}%"></div></div></div>
-            <div class="bar-row" data-value="\( {calibrationData.struktur}"><div class="bar-label"><span>Struktur</span><span> \){calibrationData.struktur}</span></div><div class="bar-track"><div class="bar-fill" style="width:${calibrationData.struktur}%"></div></div></div>
-            <div class="bar-row" data-value="\( {calibrationData.praecision}"><div class="bar-label"><span>Technische Präzision</span><span> \){calibrationData.praecision}</span></div><div class="bar-track"><div class="bar-fill" style="width:${calibrationData.praecision}%"></div></div></div>
-        `;
-    }
+// === UTILS ===
+function resetAll(){
+  if(!confirm('Wirklich alles zurücksetzen?'))return;
+  State.progress={discipline:1,unlocked:[true,false,false,false],mastered:[false,false,false,false]};
+  State.arcade.lives=5;
+  localStorage.clear();
+  showScreen('screen-hub');
+  updateHub();
+  log('System reset','warn');
+}
 
-    function saveData() {
-        localStorage.setItem('calibrationData', JSON.stringify(calibrationData));
-        renderCalibrationChart();
-    }
-
-    // ===== QUICK PSYCHOMETRIE DEMO =====
-    function runQuickTest() {
-        const questions = [
-            "Ich plane gerne langfristig und strukturiert.",
-            "Ich liebe es, neue Ideen auszuprobieren – auch auf Risiko.",
-            "Harmonie und Beziehungen sind mir besonders wichtig."
-        ];
-        let score = 0;
-        questions.forEach((q,i) => {
-            const ans = confirm(q + "\n\nJa = 1 Punkt");
-            if (ans) score++;
-        });
-        const type = score > 2 ? "Typ 3 – Der Leistungsorientierte" : score > 1 ? "Typ 7 – Der Enthusiast" : "Typ 5 – Der Forscher";
-        alert(`🎯 Dein Enneagramm-Typ (Demo): ${type}\n\nWird automatisch in FUNKENFLUG gespeichert!`);
-        localStorage.setItem('lastEnneagram', type);
-    }
-
-    // ===== SMOOTH SCROLL + ACTIVE NAV =====
-    function scrollToSection(id) {
-        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    }
-
-    // ===== INIT =====
-    window.onload = () => {
-        renderCalibrationChart();
-        
-        // Alle Bar-Fills aus Original-HTML animieren
-        document.querySelectorAll('.bar-fill').forEach(bar => {
-            const w = bar.style.width || '0%';
-            bar.style.width = '0%';
-            setTimeout(() => { bar.style.width = w; }, 300);
-        });
-        
-        console.log('%c🚀 HansAssistent Pro v3.1 PWA gestartet – voll editierbar, installierbar, offline-fähig!', 'color:#f5b642;font-size:1.1rem;font-weight:700');
-    };
+// === INIT ===
+window.onload=()=>{
+  updateHub();
+  if('serviceWorker' in navigator){
+    const sw=URL.createObjectURL(new Blob(['self.addEventListener(\'fetch\',e=>e.respondWith(fetch(e.request).catch(()=>new Response(\'Offline\'))))'],{type:'application/javascript'}));
+    navigator.serviceWorker.register(sw).catch(()=>{});
+  }
+};
 </script>
 </body>
 </html>
